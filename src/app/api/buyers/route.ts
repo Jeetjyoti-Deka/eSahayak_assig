@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { mapBhkEnumToValue, mapTimelineEnumToValue } from "@/lib/utils";
 import { createBuyerSchema } from "@/lib/validations";
+import { Prisma, City, PropertyType, Status, Timeline } from "@prisma/client";
 
 export async function POST(req: Request) {
   const data = await req.json();
@@ -55,17 +56,55 @@ export async function POST(req: Request) {
   });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+
+  // Extract filters
+  const city = searchParams.get("city") || undefined;
+  const propertyType = searchParams.get("propertyType") || undefined;
+  const status = searchParams.get("status") || undefined;
+  const timeline = searchParams.get("timeline") || undefined;
+  const search = searchParams.get("search") || undefined;
+
+  const page = Number(searchParams.get("page")) || 1;
+  const pageSize = Number(searchParams.get("pageSize")) || 10;
+  const sortBy = searchParams.get("sortBy") || "updatedAt";
+  const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
+
+  const where: Prisma.BuyerWhereInput = {
+    ...(city && city !== "undefined" ? { city: city as City } : {}),
+    ...(propertyType && propertyType !== "undefined"
+      ? { propertyType: propertyType as PropertyType }
+      : {}),
+    ...(status && status !== "undefined" ? { status: status as Status } : {}),
+    ...(timeline && timeline !== "undefined"
+      ? { timeline: timeline as Timeline }
+      : {}),
+    ...(search && search !== "undefined"
+      ? {
+          OR: [
+            { fullName: { contains: search, mode: "insensitive" } },
+            { phone: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+
+  const total = await prisma.buyer.count({ where });
+
   const buyers = await prisma.buyer.findMany({
-    include: {
-      history: true,
-    },
+    where,
+    orderBy: { [sortBy]: sortOrder },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
   });
-  return Response.json(
-    buyers.map((buyer) => ({
-      ...buyer,
-      bhk: mapBhkEnumToValue(buyer.bhk),
-      timeline: mapTimelineEnumToValue(buyer.timeline),
-    }))
-  );
+
+  return Response.json({
+    data: buyers,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  });
 }

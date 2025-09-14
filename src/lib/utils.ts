@@ -22,8 +22,55 @@ export function mapTimelineEnumToValue(timeline: string | null) {
   const map: Record<string, string> = {
     ZERO_TO_THREE: "within 3 months",
     THREE_TO_SIX: "within 3-6 months",
-    MORE_THAN_SIX: "after 6 months",
+    GREATER_THAN_6: "after 6 months",
     EXPLORING: "exploring",
   };
   return map[timeline];
+}
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function formatDate(dateInput: string | Date): string {
+  const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+export function getFilterOptions() {
+  const cities = ["Chandigarh", "Mohali", "Zirakpur", "Panchkula", "Other"];
+  const propertyTypes = ["Apartment", "Villa", "Plot", "Office", "Retail"];
+  const statuses = [
+    "New",
+    "Qualified",
+    "Contacted",
+    "Visited",
+    "Negotiation",
+    "Converted",
+    "Dropped",
+  ];
+  const timelines = [
+    "ZERO_TO_THREE",
+    "THREE_TO_SIX",
+    "GREATER_THAN_6",
+    "Exploring",
+  ];
+
+  return {
+    cities,
+    propertyTypes,
+    statuses,
+    timelines,
+  };
 }
