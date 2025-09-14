@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { mapBhkEnumToValue, mapTimelineEnumToValue } from "@/lib/utils";
+import { getCurrentUser } from "@/lib/session";
 import { createBuyerSchema } from "@/lib/validations";
 import { NextResponse } from "next/server";
 
@@ -41,42 +41,6 @@ export async function GET(
   }
 }
 
-// export async function PUT(
-//   req: Request,
-//   { params }: { params: { id: string } }
-// ) {
-//   try {
-//     const id = params.id;
-//     if (!id) {
-//       return NextResponse.json(
-//         { error: "Buyer ID is required" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // 1. Parse and validate request body
-//     const data = await req.json();
-//     const parsed = createBuyerSchema.safeParse(data);
-//     if (!parsed.success) {
-//       return Response.json({ errors: parsed.error.issues }, { status: 400 });
-//     }
-
-//     // 2. Update buyer in DB
-//     const updatedBuyer = await prisma.buyer.update({
-//       where: { id },
-//       data: parsed.data,
-//     });
-
-//     return NextResponse.json(updatedBuyer, { status: 200 });
-//   } catch (error) {
-//     console.error("Error updating buyer:", error);
-//     return NextResponse.json(
-//       { error: "Failed to update buyer" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
@@ -89,6 +53,10 @@ export async function PUT(
     );
   }
   // TODO: check if user is authenticated and has access to the buyer
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return Response.json({ error: "User not authenticated" }, { status: 401 });
+  }
 
   const data = await req.json();
 
@@ -99,17 +67,6 @@ export async function PUT(
   }
 
   return await prisma.$transaction(async (tx) => {
-    // 1️⃣ Find dummy user
-    const user = await tx.user.findUnique({
-      where: {
-        email: "test-user@example.com",
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
     // 1️⃣ Find original buyer
     const originalBuyer = await tx.buyer.findUnique({
       where: {
@@ -119,6 +76,10 @@ export async function PUT(
 
     if (!originalBuyer) {
       return NextResponse.json({ error: "Buyer not found" }, { status: 404 });
+    }
+
+    if (originalBuyer.ownerId !== user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // 1️⃣ Update buyer

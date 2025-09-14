@@ -17,6 +17,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { BuyerData } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { statusColors, timelineLabels } from "@/lib/mappings";
+import { useUser } from "@/context/user-context";
 
 interface DataTableProps {
   data: BuyerData[];
@@ -27,6 +28,7 @@ interface DataTableProps {
 
 export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
   const router = useRouter();
+  const { userId } = useUser();
 
   const getSortIcon = (column: string) => {
     if (sortBy !== column) {
@@ -141,6 +143,7 @@ export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
                         router.push(`/buyers/${lead.id}?edit=true`);
                       }}
                       className="h-8 w-8 p-0"
+                      disabled={lead.ownerId !== userId}
                     >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Edit lead</span>

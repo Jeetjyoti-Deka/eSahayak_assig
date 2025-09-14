@@ -1,10 +1,17 @@
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 import { mapBhkEnumToValue, mapTimelineEnumToValue } from "@/lib/utils";
 import { createBuyerSchema } from "@/lib/validations";
 import { Prisma, City, PropertyType, Status, Timeline } from "@prisma/client";
 
 export async function POST(req: Request) {
   const data = await req.json();
+
+  // TODO: check if user is authenticated
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return Response.json({ error: "User not authenticated" }, { status: 401 });
+  }
 
   // ✅ Validate input server-side
   const parsed = createBuyerSchema.safeParse(data);
@@ -13,19 +20,6 @@ export async function POST(req: Request) {
   }
 
   return await prisma.$transaction(async (tx) => {
-    // 1️⃣ Find or create a dummy user
-    const user = await tx.user.upsert({
-      where: {
-        email: "test-user@example.com",
-      },
-      update: {}, // no update needed if exists
-      create: {
-        email: "test-user@example.com",
-        name: "Test User",
-        password: "password",
-      },
-    });
-
     // 1️⃣ Create buyer
     const newBuyer = await tx.buyer.create({
       data: {

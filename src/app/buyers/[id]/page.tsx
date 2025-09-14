@@ -4,6 +4,7 @@ import BuyerForm from "@/components/buyer-form";
 import { BuyerHistory } from "@/components/buyer-history";
 import { BuyerInfo } from "@/components/buyer-info";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/context/user-context";
 import { BuyerData, FormData, HistoryEntry } from "@/lib/types";
 import { ArrowLeft, Edit, Loader2, MessageSquare } from "lucide-react";
 import Link from "next/link";
@@ -23,6 +24,7 @@ export default function BuyerDetailsPage({
   const [isEdit, setIsEdit] = useState(false);
   const { id } = React.use(params);
   const router = useRouter();
+  const { userId } = useUser();
 
   const onSubmit = async (data: FormData) => {
     const res = await fetch(`/api/buyers/${id}`, {
@@ -98,6 +100,7 @@ export default function BuyerDetailsPage({
                   size="sm"
                   className="bg-accent hover:bg-accent/90"
                   onClick={() => setIsEdit(true)}
+                  disabled={buyer.ownerId !== userId}
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Buyer
