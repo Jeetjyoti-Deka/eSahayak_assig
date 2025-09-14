@@ -1,4 +1,6 @@
 import { Buyer } from "@prisma/client";
+import { createBuyerSchema } from "./validations";
+import { z } from "zod";
 
 export type BuyerData = Buyer;
 
@@ -28,3 +30,5 @@ export interface HistoryEntry {
   changedAt: Date;
   diff: Record<string, any>;
 }
+
+export type FormData = z.infer<typeof createBuyerSchema>;

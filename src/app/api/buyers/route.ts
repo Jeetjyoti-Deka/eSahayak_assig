@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     // 1️⃣ Create buyer
     const newBuyer = await tx.buyer.create({
       data: {
-        ...data,
+        ...parsed.data,
         ownerId: user.id,
       },
     });

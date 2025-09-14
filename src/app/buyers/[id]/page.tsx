@@ -1,11 +1,13 @@
 "use client";
 
+import BuyerForm from "@/components/buyer-form";
 import { BuyerHistory } from "@/components/buyer-history";
 import { BuyerInfo } from "@/components/buyer-info";
 import { Button } from "@/components/ui/button";
-import { BuyerData, HistoryEntry } from "@/lib/types";
+import { BuyerData, FormData, HistoryEntry } from "@/lib/types";
 import { ArrowLeft, Edit, Loader2, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import React from "react";
@@ -15,10 +17,26 @@ export default function BuyerDetailsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [buyer, setBuyer] = useState<BuyerData | null>(null);
+  const [buyer, setBuyer] = useState<BuyerData | undefined>(undefined);
   const [history, setHistory] = useState<HistoryEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEdit, setIsEdit] = useState(false);
   const { id } = React.use(params);
+  const router = useRouter();
+
+  const onSubmit = async (data: FormData) => {
+    const res = await fetch(`/api/buyers/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      router.push("/buyers");
+    } else {
+      const err = await res.json();
+      alert(err.error);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -66,14 +84,25 @@ export default function BuyerDetailsPage({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {/* <Button variant="outline" size="sm">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Add Note
-              </Button> */}
-              <Button size="sm" className="bg-accent hover:bg-accent/90">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Buyer
-              </Button>
+              {isEdit ? (
+                <Button
+                  size="sm"
+                  className="bg-popover-foreground hover:bg-popover-foreground/90"
+                  onClick={() => setIsEdit(false)}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="bg-accent hover:bg-accent/90"
+                  onClick={() => setIsEdit(true)}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Buyer
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -81,17 +110,23 @@ export default function BuyerDetailsPage({
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Buyer Information - Takes 2 columns */}
-          <div className="lg:col-span-2">
-            <BuyerInfo buyer={buyer} />
+        {isEdit ? (
+          <div>
+            <BuyerForm defaultValues={buyer} onSubmit={onSubmit} />
           </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Buyer Information - Takes 2 columns */}
+            <div className="lg:col-span-2">
+              <BuyerInfo buyer={buyer} />
+            </div>
 
-          {/* Buyer History - Takes 1 column */}
-          <div className="lg:col-span-1">
-            <BuyerHistory history={history} />
+            {/* Buyer History - Takes 1 column */}
+            <div className="lg:col-span-1">
+              <BuyerHistory history={history} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

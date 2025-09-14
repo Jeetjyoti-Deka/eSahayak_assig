@@ -7,8 +7,8 @@ export const createBuyerSchema = z
       .min(1, { error: "Name is required" })
       .min(2, { error: "Name should have at least 2 characters" }),
     email: z.preprocess(
-      (val) => (val === "" ? undefined : val), // convert empty string to undefined
-      z.email({ error: "Please enter a valid email address" }).optional()
+      (val) => (val === "" ? null : val), // convert empty string to undefined
+      z.email({ error: "Please enter a valid email address" }).nullable()
     ),
     phone: z.preprocess(
       (val) => (val === "" ? undefined : val), // convert empty string to undefined
@@ -26,27 +26,30 @@ export const createBuyerSchema = z
       .enum(["STUDIO", "ONE", "TWO", "THREE", "FOUR"], {
         error: "Please select a BHK",
       })
+      .nullable()
       .optional(),
-    purpose: z.enum(["Buy", "Rent"]),
+    purpose: z.enum(["Buy", "Rent"], {
+      error: "Please select a purpose",
+    }),
     budgetMin: z.preprocess((val) => {
       if (val === "" || val === null || val === undefined) return undefined;
       return Number(val);
-    }, z.number().optional()),
+    }, z.number().optional().nullable()),
 
     budgetMax: z.preprocess((val) => {
       if (val === "" || val === null || val === undefined) return undefined;
       return Number(val);
-    }, z.number().optional()),
+    }, z.number().optional().nullable()),
     timeline: z.enum(
       ["ZERO_TO_THREE", "THREE_TO_SIX", "GREATER_THAN_6", "Exploring"],
       {
         error: "Please select a timeline",
       }
     ),
-    source: z.enum(["Website", "Referral", "Walk-in", "Call", "Other"], {
+    source: z.enum(["Website", "Referral", "Walk_in", "Call", "Other"], {
       error: "Please select a source",
     }),
-    notes: z.string().max(1000).optional(),
+    notes: z.string().max(1000).optional().nullable(),
     tags: z.array(z.string()).optional(),
   })
   .superRefine((data, ctx) => {
