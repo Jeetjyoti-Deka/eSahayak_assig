@@ -20,3 +20,11 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   totalPages: number;
 }
+
+export interface HistoryEntry {
+  id: string;
+  buyerId: string;
+  changedBy: string;
+  changedAt: Date;
+  diff: Record<string, any>;
+}

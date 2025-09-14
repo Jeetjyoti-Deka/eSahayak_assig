@@ -30,3 +30,33 @@ export const cityLabels = {
   Panchkula: "Panchkula",
   Other: "Other",
 };
+
+export const bhkLabels = {
+  STUDIO: "Studio",
+  ONE: "1",
+  TWO: "2",
+  THREE: "3",
+  FOUR: "4",
+};
+
+export const sourceLabels = {
+  Website: "Website",
+  Referral: "Referral",
+  Walk_in: "Walk-in",
+  Call: "Call",
+  Other: "Other",
+};
+
+export const statusColors = {
+  New: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  Qualified:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+  Contacted:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+  Visited:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+  Negotiation: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+  Converted:
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
+  Dropped: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+};

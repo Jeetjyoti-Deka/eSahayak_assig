@@ -1,0 +1,98 @@
+"use client";
+
+import { BuyerHistory } from "@/components/buyer-history";
+import { BuyerInfo } from "@/components/buyer-info";
+import { Button } from "@/components/ui/button";
+import { BuyerData, HistoryEntry } from "@/lib/types";
+import { ArrowLeft, Edit, Loader2, MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+import React from "react";
+
+export default function BuyerDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const [buyer, setBuyer] = useState<BuyerData | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = React.use(params);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchBuyer = async () => {
+      const response = await fetch(`/api/buyers/${id}`);
+      const data = await response.json();
+      setBuyer(data);
+      setHistory(data.history);
+      setLoading(false);
+    };
+    fetchBuyer();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center">
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!buyer || !history) {
+    return <div>Buyer not found</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b border-border bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-6">
+            <div className="flex items-center gap-4">
+              <Link href="/buyers">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Buyers
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  {buyer.fullName}
+                </h1>
+                <p className="text-muted-foreground">Buyer ID: {buyer.id}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {/* <Button variant="outline" size="sm">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Add Note
+              </Button> */}
+              <Button size="sm" className="bg-accent hover:bg-accent/90">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Buyer
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Buyer Information - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            <BuyerInfo buyer={buyer} />
+          </div>
+
+          {/* Buyer History - Takes 1 column */}
+          <div className="lg:col-span-1">
+            <BuyerHistory history={history} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -16,7 +16,7 @@ import { Eye, Edit, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { BuyerData } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { timelineLabels } from "@/lib/mappings";
+import { statusColors, timelineLabels } from "@/lib/mappings";
 
 interface DataTableProps {
   data: BuyerData[];
@@ -24,20 +24,6 @@ interface DataTableProps {
   sortBy: string;
   sortOrder: "asc" | "desc";
 }
-
-const statusColors = {
-  New: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  Qualified:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  Contacted:
-    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  Visited:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
-  Negotiation: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  Converted:
-    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
-  Dropped: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-};
 
 export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
   const router = useRouter();
