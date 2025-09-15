@@ -55,6 +55,10 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return Response.json({ error: "User not authenticated" }, { status: 401 });
+  }
   const { searchParams } = new URL(req.url);
 
   // Extract filters

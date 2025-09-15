@@ -1,22 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { DataTable } from "./data-table";
-import { TableFilters } from "./table-filters";
-import { SearchInput } from "./search-input";
-import { Pagination } from "./pagination";
 import { useTableParams } from "@/hooks/use-table-params";
+import { useEffect, useState } from "react";
+import { DataTable } from "./data-table";
+import { Pagination } from "./pagination";
+import { SearchInput } from "./search-input";
+import { TableFilters } from "./table-filters";
 // import { getLeads, getFilterOptions } from "@/lib/actions"
-import type { BuyerData, PaginatedResponse } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Loader2, Upload } from "lucide-react";
-import { Button } from "./ui/button";
-import { exportBuyersToCSV } from "@/lib/utils";
 import { useUser } from "@/context/user-context";
+import type { BuyerData, PaginatedResponse } from "@/lib/types";
+import { exportBuyersToCSV } from "@/lib/utils";
+import { Download, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
+import { Button } from "./ui/button";
+import { useFetchApi } from "@/hooks/use-fetch";
 
 export function LeadsTable() {
   const { filters, updateParams, resetFilters } = useTableParams();
+  const fetchApi = useFetchApi();
 
   const [data, setData] = useState<PaginatedResponse<BuyerData> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,9 +51,10 @@ export function LeadsTable() {
           )
         ).toString();
 
-        const result = await fetch(`/api/buyers?${query}`).then((res) =>
-          res.json()
-        );
+        const result = await fetchApi(`/api/buyers?${query}`).then((res) => {
+          if (!res) return null;
+          return res.json();
+        });
         setData(result);
       } catch (error) {
         console.error("Failed to load leads:", error);
@@ -83,13 +86,13 @@ export function LeadsTable() {
     updateParams({ search: search || undefined });
   };
 
-  if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
+  // if (loading && !data) {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <Loader2 className="h-8 w-8 animate-spin" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-6">
@@ -114,6 +117,12 @@ export function LeadsTable() {
         onReset={resetFilters}
         filterOptions={filterOptions}
       />
+
+      {loading && !data ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      ) : null}
 
       {/* Results Summary */}
       {data && (

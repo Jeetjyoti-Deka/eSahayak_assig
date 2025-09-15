@@ -11,6 +11,7 @@ import { ValidationErrorsTable } from "@/components/import-errors-table";
 import Papa from "papaparse";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user-context";
+import { useFetchApi } from "@/hooks/use-fetch";
 
 interface ValidationError {
   row: number;
@@ -26,20 +27,23 @@ export default function ImportPage() {
   const [successCount, setSuccessCount] = useState(0);
 
   const router = useRouter();
-  const { userId } = useUser();
+  const { userId, loading: userLoading } = useUser();
+
+  const fetchApi = useFetchApi();
 
   useEffect(() => {
+    if (userLoading) return;
     if (!userId) {
       router.push("/");
       // TODO: implement toast notification
       alert("Please sign in to access this page.");
     }
-  }, [userId, router]);
+  }, [userLoading]);
 
-  if (!userId) {
+  if (userLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin" />
+        <Loader2 className="w-4 h-4 animate-spin" />
       </div>
     );
   }
@@ -60,31 +64,21 @@ export default function ImportPage() {
           return;
         }
 
-        const res = await fetch("/api/buyers/import", {
+        const res = await fetchApi("/api/buyers/import", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(rows),
         });
 
-        const json = await res.json();
-        if (!res.ok) {
-          if (res.status === 400 && res.statusText === "Invalid input") {
-            // TODO: toast notification
-            alert("Invalid input");
-          }
-
-          if (res.status === 401) {
-            // TODO: toast notification
-            alert("Unauthorized");
-            setIsUploading(false);
-            setUploadComplete(false);
-            return;
-          }
-          // Display error table in UI
-        } else {
-          setSuccessCount(json.insertedCount);
-          setValidationErrors(json.errors);
+        if (!res) {
+          setIsUploading(false);
+          return;
         }
+
+        const json = await res.json();
+
+        setSuccessCount(json.insertedCount);
+        setValidationErrors(json.errors);
 
         setIsUploading(false);
         setUploadComplete(true);

@@ -7,20 +7,21 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const BuyersPage = () => {
-  const { userId } = useUser();
+  const { userId, loading: userLoading } = useUser();
   const router = useRouter();
   useEffect(() => {
+    if (userLoading) return;
     if (!userId) {
       router.push("/");
       // TODO: implement toast notification
       alert("Please sign in to access this page.");
     }
-  }, [userId, router]);
+  }, [userLoading]);
 
-  if (!userId) {
+  if (userLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin" />
+        <Loader2 className="w-4 h-4 animate-spin" />
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { BuyerHistory } from "@/components/buyer-history";
 import { BuyerInfo } from "@/components/buyer-info";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/user-context";
+import { useFetchApi } from "@/hooks/use-fetch";
 import { BuyerData, FormData, HistoryEntry } from "@/lib/types";
 import { ArrowLeft, Edit, Loader2, MessageSquare } from "lucide-react";
 import Link from "next/link";
@@ -24,28 +25,26 @@ export default function BuyerDetailsPage({
   const [isEdit, setIsEdit] = useState(false);
   const { id } = React.use(params);
   const router = useRouter();
-  const { userId } = useUser();
+  const { userId, loading: userLoading } = useUser();
+  const fetchApi = useFetchApi();
 
   useEffect(() => {
+    if (userLoading) return;
     if (!userId) {
       router.push("/");
       // TODO: implement toast notification
       alert("Please sign in to access this page.");
     }
-  }, [userId, router]);
-
-  if (!userId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
-  }
+  }, [userLoading]);
 
   useEffect(() => {
     setLoading(true);
     const fetchBuyer = async () => {
-      const response = await fetch(`/api/buyers/${id}`);
+      const response = await fetchApi(`/api/buyers/${id}`);
+      if (!response) {
+        setLoading(false);
+        return;
+      }
       const data = await response.json();
       setBuyer(data);
       setHistory(data.history);
@@ -56,10 +55,14 @@ export default function BuyerDetailsPage({
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    const res = await fetch(`/api/buyers/${id}`, {
+    const res = await fetchApi(`/api/buyers/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
+
+    if (!res) {
+      return;
+    }
 
     const resp = await res.json();
 
@@ -77,6 +80,14 @@ export default function BuyerDetailsPage({
 
     setLoading(false);
   };
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-4 h-4 animate-spin" />
+      </div>
+    );
+  }
 
   if (loading) {
     return (
