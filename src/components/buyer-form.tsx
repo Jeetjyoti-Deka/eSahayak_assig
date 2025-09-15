@@ -34,7 +34,6 @@ interface BuyerFormProps {
 }
 
 export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -64,20 +63,6 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
       watchedTags.filter((tag) => tag !== tagToRemove)
     );
   };
-
-  //   const onSubmit = async (data: FormData) => {
-  //     const res = await fetch("/api/buyers", {
-  //       method: "POST",
-  //       body: JSON.stringify(data),
-  //     });
-  //     if (res.ok) {
-  //       router.push("/buyers");
-  //     } else {
-  //       const err = await res.json();
-  //       // TODO: implement toast notification
-  //       alert(err.error);
-  //     }
-  //   };
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -165,7 +150,6 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                   </div>
                 </div>
               </div>
-
               {/* Budget Range Section */}
               <div className="form-section space-y-6">
                 <h3 className="text-xl font-semibold text-foreground border-b border-border pb-2">
@@ -216,7 +200,6 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                   </div>
                 </div>
               </div>
-
               {/* Property Preferences Section */}
               <div className="form-section space-y-6">
                 <h3 className="text-xl font-semibold text-foreground border-b border-border pb-2">
@@ -370,7 +353,6 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                   </div>
                 </div>
               </div>
-
               {/* Lead Tracking Section */}
               <div className="form-section space-y-6">
                 <h3 className="text-xl font-semibold text-foreground border-b border-border pb-2">
@@ -452,6 +434,53 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                       </p>
                     )}
                   </div>
+
+                  {defaultValues && (
+                    <div className="form-field-focus space-y-2">
+                      <Label
+                        htmlFor="purpose"
+                        className="text-sm font-medium text-card-foreground"
+                      >
+                        Purpose *
+                      </Label>
+                      <Controller
+                        name="status"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger className="h-12 w-full">
+                              <SelectValue placeholder="Select purpose" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="New">New</SelectItem>
+                              <SelectItem value="Qualified">
+                                Qualified
+                              </SelectItem>
+                              <SelectItem value="Contacted">
+                                Contacted
+                              </SelectItem>
+                              <SelectItem value="Visited">Visited</SelectItem>
+                              <SelectItem value="Negotiation">
+                                Negotiation
+                              </SelectItem>
+                              <SelectItem value="Converted">
+                                Converted
+                              </SelectItem>
+                              <SelectItem value="Dropped">Dropped</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.purpose && (
+                        <p className="text-sm text-destructive">
+                          {errors.purpose.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-field-focus space-y-2">
@@ -529,7 +558,6 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                   )}
                 </div>
               </div>
-
               {/* Submit Button */}
               <div className="pt-6">
                 <Button

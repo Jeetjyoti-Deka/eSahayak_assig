@@ -51,6 +51,20 @@ export const createBuyerSchema = z
     }),
     notes: z.string().max(1000).optional().nullable(),
     tags: z.array(z.string()).optional(),
+    status: z
+      .enum(
+        [
+          "New",
+          "Qualified",
+          "Contacted",
+          "Visited",
+          "Negotiation",
+          "Converted",
+          "Dropped",
+        ],
+        { error: "Please select a status" }
+      )
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (
