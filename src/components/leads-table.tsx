@@ -9,7 +9,9 @@ import { useTableParams } from "@/hooks/use-table-params";
 // import { getLeads, getFilterOptions } from "@/lib/actions"
 import type { BuyerData, PaginatedResponse } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
+import { Button } from "./ui/button";
+import { exportBuyersToCSV } from "@/lib/utils";
 
 export function LeadsTable() {
   const { filters, updateParams, resetFilters } = useTableParams();
@@ -124,18 +126,30 @@ export function LeadsTable() {
               "No leads found"
             ) : (
               <>
-                Showing {(data.page - 1) * data.pageSize + 1} to{" "}
-                {Math.min(data.page * data.pageSize, data.total)} of{" "}
-                {data.total} leads
+                {loading ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </div>
+                ) : (
+                  `Showing ${(data.page - 1) * data.pageSize + 1} to
+                ${Math.min(data.page * data.pageSize, data.total)} of
+                ${data.total} leads`
+                )}
               </>
             )}
           </div>
-          {loading && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading...
-            </div>
-          )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportBuyersToCSV(data.data)}
+            className="flex items-center gap-2 bg-transparent"
+            disabled={loading || data.total === 0}
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
         </div>
       )}
 

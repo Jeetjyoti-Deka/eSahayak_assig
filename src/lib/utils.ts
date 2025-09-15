@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { parse } from "json2csv";
+import { Buyer } from "@prisma/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -73,4 +75,41 @@ export function getFilterOptions() {
     statuses,
     timelines,
   };
+}
+
+export function exportBuyersToCSV(buyers: Buyer[]) {
+  try {
+    const fields = [
+      "fullName",
+      "email",
+      "phone",
+      "city",
+      "propertyType",
+      "bhk",
+      "purpose",
+      "budgetMin",
+      "budgetMax",
+      "timeline",
+      "source",
+      "notes",
+      "tags",
+      "status",
+    ];
+
+    // ✅ Convert to CSV
+    const csv = parse(buyers, { fields });
+
+    // ✅ Trigger file download
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "buyers.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    console.error("Error exporting CSV:", err);
+  }
 }
