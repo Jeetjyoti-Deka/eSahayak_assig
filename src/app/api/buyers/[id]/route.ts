@@ -19,6 +19,14 @@ export async function GET(
       where: { id: id },
       include: {
         history: {
+          include: {
+            changedByUser: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
           orderBy: {
             changedAt: "desc",
           },
@@ -124,7 +132,26 @@ export async function PUT(
       });
     }
 
+    // 🔑 Fetch updated buyer with history (latest 5)
+    const buyerWithHistory = await tx.buyer.findUnique({
+      where: { id: updatedBuyer.id },
+      include: {
+        history: {
+          include: {
+            changedByUser: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: { changedAt: "desc" },
+          take: 5,
+        },
+      },
+    });
+
     // 3️⃣ Return transformed response
-    return Response.json(updatedBuyer, { status: 200 });
+    return Response.json(buyerWithHistory, { status: 200 });
   });
 }

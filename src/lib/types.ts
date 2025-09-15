@@ -27,8 +27,26 @@ export interface HistoryEntry {
   id: string;
   buyerId: string;
   changedBy: string;
+  changedByUser: {
+    name?: string;
+    email: string;
+  };
   changedAt: Date;
-  diff: Record<string, any>;
+  diff:
+    | {
+        action: "CREATE";
+        newValues: Record<string, any>;
+      }
+    | {
+        action: "UPDATE";
+        fields: Record<
+          string,
+          {
+            from: any;
+            to: any;
+          }
+        >;
+      };
 }
 
 export type FormData = z.infer<typeof createBuyerSchema>;

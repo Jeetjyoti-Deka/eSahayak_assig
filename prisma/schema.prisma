@@ -44,16 +44,18 @@ model BuyerHistory {
   changedAt DateTime @default(now())
   diff      Json
 
-  buyer Buyer @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyer         Buyer @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  changedByUser User  @relation("UserBuyerHistories", fields: [changedBy], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  password String  @db.VarChar(255) // hashed password
-  name     String?
-  role     Role    @default(USER)
-  buyers   Buyer[]
+  id             String         @id @default(uuid())
+  email          String         @unique
+  password       String         @db.VarChar(255) // hashed password
+  name           String?
+  role           Role           @default(USER)
+  buyers         Buyer[]
+  buyerHistories BuyerHistory[] @relation("UserBuyerHistories")
 }
 
 enum Role {

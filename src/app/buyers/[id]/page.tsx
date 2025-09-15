@@ -27,17 +27,27 @@ export default function BuyerDetailsPage({
   const { userId } = useUser();
 
   const onSubmit = async (data: FormData) => {
+    setLoading(true);
     const res = await fetch(`/api/buyers/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
 
+    const resp = await res.json();
+
+    setHistory(resp.history);
+    delete resp.history;
+    setBuyer(resp);
+
     if (res.ok) {
-      router.push("/buyers");
+      router.refresh();
+      setIsEdit(false);
     } else {
       const err = await res.json();
       alert(err.error);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {

@@ -24,29 +24,55 @@ const formatChangeValue = (key: string, value: any) => {
   return String(value);
 };
 
-const getChangeDescription = (diff: Record<string, any>) => {
+const getChangeDescription = (diff: HistoryEntry["diff"]) => {
   const changes: string[] = [];
 
-  Object.entries(diff).forEach(([field, change]) => {
-    if (change.created) {
-      changes.push(
-        `Created ${field}: ${formatChangeValue(field, change.created)}`
-      );
-    } else if (change.added) {
-      if (Array.isArray(change.added)) {
-        changes.push(`Added ${field}: ${change.added.join(", ")}`);
-      } else {
-        changes.push(`Added ${field}: ${change.added}`);
+  if (diff.action === "CREATE") {
+    changes.push("Buyer created");
+  }
+
+  if (diff.action === "UPDATE") {
+    Object.entries(diff.fields).forEach(([field, { from, to }]) => {
+      if (field === "notes") {
+        changes.push(`Changed notes`);
+        return;
       }
-    } else if (change.from && change.to) {
+      if (field === "tags") {
+        if (from.length === 0 && to.length === 0) {
+          return;
+        }
+
+        if (from.length === 0 && to.length > 0) {
+          changes.push(`Added tags: ${to.join(", ")}`);
+        }
+
+        if (from.length > 0 && to.length === 0) {
+          changes.push(`Removed tags: ${from.join(", ")}`);
+        }
+
+        if (from.length > 0 && to.length > 0) {
+          const addedTags = to.filter((tag: string) => !from.includes(tag));
+          const removedTags = from.filter((tag: string) => !to.includes(tag));
+
+          if (addedTags.length > 0) {
+            changes.push(`Added tags: ${addedTags.join(", ")}`);
+          }
+
+          if (removedTags.length > 0) {
+            changes.push(`Removed tags: ${removedTags.join(", ")}`);
+          }
+        }
+
+        return;
+      }
       changes.push(
         `Changed ${field} from ${formatChangeValue(
           field,
-          change.from
-        )} to ${formatChangeValue(field, change.to)}`
+          from
+        )} to ${formatChangeValue(field, to)}`
       );
-    }
-  });
+    });
+  }
 
   return changes;
 };
@@ -87,7 +113,7 @@ export function BuyerHistory({ history }: BuyerHistoryProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium text-foreground">
-                        {entry.changedBy}
+                        {entry.changedByUser.name || entry.changedByUser.email}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatDate(entry.changedAt)}
