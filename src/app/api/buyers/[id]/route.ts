@@ -74,6 +74,10 @@ export async function PUT(
     return Response.json({ errors: parsed.error.issues }, { status: 400 });
   }
 
+  if (!["Apartment", "Villa"].includes(parsed.data.propertyType)) {
+    parsed.data.bhk = null;
+  }
+
   return await prisma.$transaction(async (tx) => {
     // 1️⃣ Find original buyer
     const originalBuyer = await tx.buyer.findUnique({
@@ -96,7 +100,7 @@ export async function PUT(
         id,
       },
       data: {
-        ...data,
+        ...parsed.data,
       },
     });
 

@@ -19,6 +19,10 @@ export async function POST(req: Request) {
     return Response.json({ errors: parsed.error.issues }, { status: 400 });
   }
 
+  if (!["Apartment", "Villa"].includes(parsed.data.propertyType)) {
+    parsed.data.bhk = null;
+  }
+
   return await prisma.$transaction(async (tx) => {
     // 1️⃣ Create buyer
     const newBuyer = await tx.buyer.create({

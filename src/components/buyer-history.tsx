@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { bhkLabels, timelineLabels } from "@/lib/mappings";
 import { HistoryEntry } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { BHK, Timeline } from "@prisma/client";
 import { History, User, Bot } from "lucide-react";
 
 interface BuyerHistoryProps {
@@ -33,6 +35,39 @@ const getChangeDescription = (diff: HistoryEntry["diff"]) => {
 
   if (diff.action === "UPDATE") {
     Object.entries(diff.fields).forEach(([field, { from, to }]) => {
+      if (field === "timeline") {
+        changes.push(
+          `Changed timeline from ${formatChangeValue(
+            field,
+            timelineLabels[from as Timeline]
+          )} to ${formatChangeValue(field, timelineLabels[to as Timeline])}`
+        );
+        return;
+      }
+      if (field === "bhk") {
+        if (from === null && to === null) {
+          return;
+        }
+        if (from === null && to !== null) {
+          changes.push(
+            `Added bhk: ${formatChangeValue(field, bhkLabels[to as BHK])}`
+          );
+          return;
+        }
+        if (from !== null && to === null) {
+          changes.push(
+            `Removed bhk: ${formatChangeValue(field, bhkLabels[from as BHK])}`
+          );
+          return;
+        }
+        changes.push(
+          `Changed bhk from ${formatChangeValue(
+            field,
+            bhkLabels[from as BHK]
+          )} to ${formatChangeValue(field, bhkLabels[to as BHK])}`
+        );
+        return;
+      }
       if (field === "notes") {
         changes.push(`Changed notes`);
         return;
