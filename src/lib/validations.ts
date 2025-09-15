@@ -50,7 +50,18 @@ export const createBuyerSchema = z
       error: "Please select a source",
     }),
     notes: z.string().max(1000).optional().nullable(),
-    tags: z.array(z.string()).optional(),
+    tags: z
+      .preprocess((val) => {
+        if (typeof val === "string") {
+          try {
+            return JSON.parse(val);
+          } catch {
+            return [];
+          }
+        }
+        return val;
+      }, z.array(z.string()))
+      .optional(),
     status: z
       .enum(
         [

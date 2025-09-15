@@ -9,21 +9,18 @@ import { useTableParams } from "@/hooks/use-table-params";
 // import { getLeads, getFilterOptions } from "@/lib/actions"
 import type { BuyerData, PaginatedResponse } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { exportBuyersToCSV } from "@/lib/utils";
+import { useUser } from "@/context/user-context";
+import Link from "next/link";
 
 export function LeadsTable() {
   const { filters, updateParams, resetFilters } = useTableParams();
 
   const [data, setData] = useState<PaginatedResponse<BuyerData> | null>(null);
   const [loading, setLoading] = useState(true);
-  //   const [filterOptions, setFilterOptions] = useState({
-  //     cities: [],
-  //     propertyTypes: [],
-  //     statuses: [],
-  //     timelines: [],
-  //   })
+  const { userId } = useUser();
   const filterOptions = {
     cities: ["Chandigarh", "Mohali", "Zirakpur", "Panchkula", "Other"],
     propertyTypes: ["Apartment", "Villa", "Plot", "Office", "Retail"],
@@ -140,16 +137,27 @@ export function LeadsTable() {
             )}
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportBuyersToCSV(data.data)}
-            className="flex items-center gap-2 bg-transparent"
-            disabled={loading || data.total === 0}
-          >
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" disabled={loading || !userId}>
+              <Link
+                href="/import"
+                className="flex items-center gap-2 bg-transparent"
+              >
+                <Upload className="h-4 w-4" />
+                Import CSV
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportBuyersToCSV(data.data)}
+              className="flex items-center gap-2 bg-transparent"
+              disabled={loading || data.total === 0}
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
+          </div>
         </div>
       )}
 
