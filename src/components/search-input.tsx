@@ -21,7 +21,10 @@ export function SearchInput({
   debounceMs = 300,
 }: SearchInputProps) {
   const [localValue, setLocalValue] = useState(value);
-  const debouncedValue = useDebouncedValue(localValue, debounceMs);
+  const [debouncedValue, setDebouncedValue] = useDebouncedValue(
+    localValue,
+    debounceMs
+  );
 
   // Update local value when external value changes
   useEffect(() => {
@@ -36,6 +39,7 @@ export function SearchInput({
   }, [debouncedValue, value, onValueChange]);
 
   const clearSearch = () => {
+    setDebouncedValue("");
     setLocalValue("");
     onValueChange("");
   };
@@ -58,16 +62,13 @@ export function SearchInput({
             variant="ghost"
             size="sm"
             onClick={clearSearch}
-            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 p-0 hover:bg-transparent"
+            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Clear search</span>
           </Button>
         )}
       </div>
-      {localValue !== debouncedValue && (
-        <div className="text-xs text-muted-foreground">Searching...</div>
-      )}
     </div>
   );
 }
