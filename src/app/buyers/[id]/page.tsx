@@ -26,6 +26,34 @@ export default function BuyerDetailsPage({
   const router = useRouter();
   const { userId } = useUser();
 
+  useEffect(() => {
+    if (!userId) {
+      router.push("/");
+      // TODO: implement toast notification
+      alert("Please sign in to access this page.");
+    }
+  }, [userId, router]);
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchBuyer = async () => {
+      const response = await fetch(`/api/buyers/${id}`);
+      const data = await response.json();
+      setBuyer(data);
+      setHistory(data.history);
+      setLoading(false);
+    };
+    fetchBuyer();
+  }, [id]);
+
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     const res = await fetch(`/api/buyers/${id}`, {
@@ -49,18 +77,6 @@ export default function BuyerDetailsPage({
 
     setLoading(false);
   };
-
-  useEffect(() => {
-    setLoading(true);
-    const fetchBuyer = async () => {
-      const response = await fetch(`/api/buyers/${id}`);
-      const data = await response.json();
-      setBuyer(data);
-      setHistory(data.history);
-      setLoading(false);
-    };
-    fetchBuyer();
-  }, [id]);
 
   if (loading) {
     return (

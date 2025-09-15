@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { FileUpload } from "@/components/file-upload";
 import { ValidationErrorsTable } from "@/components/import-errors-table";
 // import { importLeadsFromCSV } from "@/lib/actions";
 import Papa from "papaparse";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/user-context";
 
 interface ValidationError {
   row: number;
@@ -22,6 +24,25 @@ export default function ImportPage() {
   );
   const [uploadComplete, setUploadComplete] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
+
+  const router = useRouter();
+  const { userId } = useUser();
+
+  useEffect(() => {
+    if (!userId) {
+      router.push("/");
+      // TODO: implement toast notification
+      alert("Please sign in to access this page.");
+    }
+  }, [userId, router]);
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
+  }
 
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
