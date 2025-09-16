@@ -4,59 +4,6 @@ import { getCurrentUser } from "@/lib/session";
 import { createBuyerSchema } from "@/lib/validations";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  {
-    params,
-  }: {
-    params: Promise<{
-      id: string;
-    }>;
-  }
-) {
-  const { id } = await params;
-
-  const user = await getCurrentUser(req);
-  if (!user) {
-    return Response.json({ error: "User not authenticated" }, { status: 401 });
-  }
-
-  try {
-    const buyer = await prisma.buyer.findUnique({
-      where: { id: id },
-      include: {
-        history: {
-          include: {
-            changedByUser: {
-              select: {
-                name: true,
-                email: true,
-                role: true,
-              },
-            },
-          },
-          orderBy: {
-            changedAt: "desc",
-          },
-          take: 5,
-        },
-      },
-    });
-
-    if (!buyer) {
-      return NextResponse.json({ error: "Buyer not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(buyer);
-  } catch (error) {
-    console.error("Error fetching buyer:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -68,7 +15,7 @@ export async function PUT(
       { status: 400 }
     );
   }
-  // TODO: check if user is authenticated and has access to the buyer
+
   const user = await getCurrentUser(req);
   if (!user) {
     return Response.json({ error: "User not authenticated" }, { status: 401 });
@@ -87,16 +34,12 @@ export async function PUT(
 
   const receivedUpdatedAt = new Date(data.updatedAt);
 
-  // ✅ Validate input server-side
-  const parsed = createBuyerSchema.safeParse(data);
+  const statusSchema = createBuyerSchema.pick({ status: true });
+
+  const parsed = statusSchema.safeParse({ status: data.status });
   if (!parsed.success) {
     return Response.json({ errors: parsed.error.issues }, { status: 400 });
   }
-
-  if (!["Apartment", "Villa"].includes(parsed.data.propertyType)) {
-    parsed.data.bhk = null;
-  }
-
   return await prisma.$transaction(async (tx) => {
     // 1️⃣ Find original buyer
     const originalBuyer = await tx.buyer.findUnique({
@@ -123,7 +66,7 @@ export async function PUT(
         id,
       },
       data: {
-        ...parsed.data,
+        status: parsed.data.status,
       },
     });
 
@@ -182,50 +125,4 @@ export async function PUT(
     // 3️⃣ Return transformed response
     return Response.json(buyerWithHistory, { status: 200 });
   });
-}
-
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const buyerId = params.id;
-
-    const user = await getCurrentUser(request);
-    if (!user) {
-      return Response.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
-    }
-
-    // Check if buyer exists
-    const buyer = await prisma.buyer.findUnique({
-      where: { id: buyerId },
-    });
-
-    if (!buyer) {
-      return NextResponse.json({ error: "Buyer not found" }, { status: 404 });
-    }
-
-    if (buyer.ownerId !== user.id && user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
-    // Delete buyer
-    await prisma.buyer.delete({
-      where: { id: buyerId },
-    });
-
-    return NextResponse.json(
-      { message: "Buyer deleted successfully", buyer },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("DELETE /buyers/[id] error:", error);
-    return NextResponse.json(
-      { error: "Something went wrong while deleting the buyer" },
-      { status: 500 }
-    );
-  }
 }

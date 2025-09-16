@@ -18,6 +18,7 @@ import { BuyerData } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { statusColors, timelineLabels } from "@/lib/mappings";
 import { useUser } from "@/context/user-context";
+import { StatusDropdown } from "./status-dropdown";
 
 interface DataTableProps {
   data: BuyerData[];
@@ -117,12 +118,10 @@ export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
                 </TableCell>
                 <TableCell>{timelineLabels[lead.timeline]}</TableCell>
                 <TableCell>
-                  <Badge
-                    className={statusColors[lead.status]}
-                    variant="secondary"
-                  >
-                    {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
-                  </Badge>
+                  <StatusDropdown
+                    lead={lead}
+                    isInert={user.role !== "ADMIN" && lead.ownerId !== user.id}
+                  />
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(lead.updatedAt)}
