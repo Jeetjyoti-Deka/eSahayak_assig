@@ -239,9 +239,9 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
                       <Eye className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     )}
                   </Button>
                 </div>
