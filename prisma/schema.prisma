@@ -116,3 +116,11 @@ enum Status {
   Converted
   Dropped
 }
+
+model RequestLog {
+  id        String   @id @default(uuid())
+  key       String // userId
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/session";
 import { mapBhkEnumToValue, mapTimelineEnumToValue } from "@/lib/utils";
 import { createBuyerSchema } from "@/lib/validations";
@@ -11,6 +12,15 @@ export async function POST(req: Request) {
   const user = await getCurrentUser(req);
   if (!user) {
     return Response.json({ error: "User not authenticated" }, { status: 401 });
+  }
+
+  const result = await checkRateLimit(user.id);
+
+  if (!result.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Too many requests, please try again later." }),
+      { status: 429 }
+    );
   }
 
   // ✅ Validate input server-side

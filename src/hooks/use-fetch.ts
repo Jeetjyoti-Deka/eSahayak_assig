@@ -33,6 +33,11 @@ export function useFetchApi() {
         return null;
       }
 
+      if (response.status === 429) {
+        alert("Too many requests, please try again later.");
+        return null;
+      }
+
       alert("Something went wrong. Try again later.");
       router.push("/buyers");
       return null;
