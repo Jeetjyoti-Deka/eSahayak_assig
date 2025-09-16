@@ -3,6 +3,7 @@
 import BuyerForm from "@/components/buyer-form";
 import { BuyerHistory } from "@/components/buyer-history";
 import { BuyerInfo } from "@/components/buyer-info";
+import { DeleteDialog } from "@/components/delete-dialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/user-context";
 import { useFetchApi } from "@/hooks/use-fetch";
@@ -137,15 +138,21 @@ export default function BuyerDetailsPage({
                   Cancel
                 </Button>
               ) : (
-                <Button
-                  size="sm"
-                  className="bg-accent hover:bg-accent/90"
-                  onClick={() => setIsEdit(true)}
-                  disabled={buyer.ownerId !== userId}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Buyer
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    className="bg-accent hover:bg-accent/90"
+                    onClick={() => setIsEdit(true)}
+                    disabled={buyer.ownerId !== userId}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Buyer
+                  </Button>
+                  <DeleteDialog
+                    id={buyer.id}
+                    isDisabled={userId !== buyer.ownerId}
+                  />
+                </div>
               )}
             </div>
           </div>

@@ -23,6 +23,11 @@ export function useFetchApi() {
         return null;
       }
 
+      if (response.status === 403) {
+        alert("you are not authorized for this action.");
+        return null;
+      }
+
       alert("Something went wrong. Try again later.");
       router.push("/buyers");
       return null;

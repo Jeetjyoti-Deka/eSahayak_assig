@@ -159,3 +159,49 @@ export async function PUT(
     return Response.json(buyerWithHistory, { status: 200 });
   });
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const buyerId = params.id;
+
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return Response.json(
+        { error: "User not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    // Check if buyer exists
+    const buyer = await prisma.buyer.findUnique({
+      where: { id: buyerId },
+    });
+
+    if (!buyer) {
+      return NextResponse.json({ error: "Buyer not found" }, { status: 404 });
+    }
+
+    if (buyer.ownerId !== user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    // Delete buyer
+    await prisma.buyer.delete({
+      where: { id: buyerId },
+    });
+
+    return NextResponse.json(
+      { message: "Buyer deleted successfully", buyer },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("DELETE /buyers/[id] error:", error);
+    return NextResponse.json(
+      { error: "Something went wrong while deleting the buyer" },
+      { status: 500 }
+    );
+  }
+}
