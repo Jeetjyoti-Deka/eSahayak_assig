@@ -19,6 +19,7 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { registerSchema } from "@/lib/validations";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user-context";
+import { useFetchApi } from "@/hooks/use-fetch";
 
 type FormData = z.infer<typeof registerSchema>;
 
@@ -31,8 +32,10 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const router = useRouter();
   const { setUserId } = useUser();
+  const fetchApi = useFetchApi();
 
   const {
     register,
@@ -42,7 +45,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     clearErrors,
   } = useForm<FormData>({
     resolver: zodResolver(registerSchema),
-    mode: "onBlur",
+    // mode: "onBlur",
   });
 
   const onSubmit = async (data: FormData) => {
@@ -86,6 +89,21 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setActiveTab(value as "signin" | "signup");
     clearErrors();
     reset();
+  };
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    const res = await fetchApi("/api/auth/demo");
+
+    if (!res) {
+      setDemoLoading(false);
+      alert("Could not login. Try again later.");
+      return;
+    }
+    const resp = await res.json();
+    setUserId(resp.user.id);
+    setDemoLoading(false);
+    router.push("/buyers");
   };
 
   return (
@@ -248,6 +266,17 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                 "Sign In"
               ) : (
                 "Create Account"
+              )}
+            </Button>
+
+            <Button type="button" className="w-full" onClick={handleDemoLogin}>
+              {demoLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Signin in...
+                </div>
+              ) : (
+                <div>Demo Sign in</div>
               )}
             </Button>
           </form>
