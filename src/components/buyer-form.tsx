@@ -33,6 +33,28 @@ interface BuyerFormProps {
   onSubmit: (data: FormData) => void;
 }
 
+const allSuggestions = [
+  "Urgent",
+  "Premium",
+  "First-Time Buyer",
+  "Investor",
+  "Budget-Friendly",
+  "Luxury",
+  "Ready to Move",
+  "Under Construction",
+  "Commercial Property",
+  "Residential Property",
+  "Urgent Requirement",
+  "Long-Term Plan",
+  "NRI Buyer",
+  "Local Buyer",
+  "Preferred City",
+  "Preferred Area",
+  "Verified Lead",
+  "High-Priority",
+  "Follow-Up Required",
+];
+
 export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
   const {
     register,
@@ -50,7 +72,12 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
   const [tagInput, setTagInput] = useState("");
   const watchedTags = (watch("tags") as string[]) || [];
 
-  const addTag = () => {
+  const addTag = (s?: string) => {
+    if (s) {
+      setValue("tags", [...watchedTags, s.trim()]);
+      setTagInput("");
+      return;
+    }
     if (tagInput.trim() && !watchedTags.includes(tagInput.trim())) {
       setValue("tags", [...watchedTags, tagInput.trim()]);
       setTagInput("");
@@ -63,6 +90,13 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
       watchedTags.filter((tag) => tag !== tagToRemove)
     );
   };
+
+  const filteredSuggestions = allSuggestions.filter(
+    (s) =>
+      s.toLowerCase().includes(tagInput.toLowerCase()) &&
+      !watchedTags.includes(s) &&
+      s.toLowerCase() !== tagInput.toLowerCase()
+  );
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -504,7 +538,7 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                     />
                     <Button
                       type="button"
-                      onClick={addTag}
+                      onClick={() => addTag()}
                       variant="outline"
                       className="h-12 px-6 bg-transparent"
                     >
@@ -528,6 +562,19 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
                             <X className="h-3 w-3" />
                           </button>
                         </Badge>
+                      ))}
+                    </div>
+                  )}
+                  {filteredSuggestions.length > 0 && tagInput && (
+                    <div className="absolute z-10 bg-white border rounded-md mt-1 shadow">
+                      {filteredSuggestions.map((s) => (
+                        <div
+                          key={s}
+                          className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                          onClick={() => addTag(s)}
+                        >
+                          {s}
+                        </div>
                       ))}
                     </div>
                   )}
