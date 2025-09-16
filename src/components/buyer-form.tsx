@@ -48,7 +48,7 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
 
   const propertyType = watch("propertyType");
   const [tagInput, setTagInput] = useState("");
-  const watchedTags = watch("tags") || [];
+  const watchedTags = (watch("tags") as string[]) || [];
 
   const addTag = () => {
     if (tagInput.trim() && !watchedTags.includes(tagInput.trim())) {
