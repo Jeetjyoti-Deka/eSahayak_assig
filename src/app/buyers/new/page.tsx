@@ -28,6 +28,11 @@ export default function NewBuyerPage() {
       </div>
     );
   }
+
+  if (!userId) {
+    return null;
+  }
+
   const onSubmit = async (data: FormData) => {
     const res = await fetchApi("/api/buyers", {
       method: "POST",

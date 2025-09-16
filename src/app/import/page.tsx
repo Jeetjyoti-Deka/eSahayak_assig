@@ -48,6 +48,10 @@ export default function ImportPage() {
     );
   }
 
+  if (!userId) {
+    return null;
+  }
+
   const handleFileUpload = async (file: File) => {
     setIsUploading(true);
     setValidationErrors([]);
