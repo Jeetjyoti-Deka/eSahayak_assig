@@ -10,7 +10,7 @@ import { useFetchApi } from "@/hooks/use-fetch";
 import { BuyerData, FormData, HistoryEntry } from "@/lib/types";
 import { ArrowLeft, Edit, Loader2, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import React from "react";
@@ -29,6 +29,9 @@ export default function BuyerDetailsPage({
   const { userId, loading: userLoading } = useUser();
   const fetchApi = useFetchApi();
 
+  const searchParams = useSearchParams();
+  const edit = searchParams.get("edit");
+
   useEffect(() => {
     if (userLoading) return;
     if (!userId) {
@@ -40,6 +43,9 @@ export default function BuyerDetailsPage({
 
   useEffect(() => {
     setLoading(true);
+    if (edit && edit === "true") {
+      setIsEdit(true);
+    }
     const fetchBuyer = async () => {
       const response = await fetchApi(`/api/buyers/${id}`);
       if (!response) {
