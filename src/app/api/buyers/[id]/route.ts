@@ -57,9 +57,9 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id;
+  const { id } = await params;
   if (!id) {
     return NextResponse.json(
       { error: "Buyer ID is required" },
@@ -73,6 +73,8 @@ export async function PUT(
   }
 
   const data = await req.json();
+
+  const receivedUpdatedAt = new Date(data.updatedAt);
 
   // ✅ Validate input server-side
   const parsed = createBuyerSchema.safeParse(data);
@@ -98,6 +100,10 @@ export async function PUT(
 
     if (originalBuyer.ownerId !== user.id && user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    if (originalBuyer.updatedAt.getTime() !== receivedUpdatedAt.getTime()) {
+      return NextResponse.json({ error: "stale data" }, { status: 409 });
     }
 
     // 1️⃣ Update buyer

@@ -62,12 +62,14 @@ export default function BuyerDetailsPage({
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
+
     const res = await fetchApi(`/api/buyers/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, updatedAt: buyer?.updatedAt }),
     });
 
     if (!res) {
+      setLoading(false);
       return;
     }
 

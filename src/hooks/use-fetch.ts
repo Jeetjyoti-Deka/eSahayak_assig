@@ -28,6 +28,11 @@ export function useFetchApi() {
         return null;
       }
 
+      if (response.status === 409) {
+        alert("Record changed, please refresh to get the latest data.");
+        return null;
+      }
+
       alert("Something went wrong. Try again later.");
       router.push("/buyers");
       return null;
