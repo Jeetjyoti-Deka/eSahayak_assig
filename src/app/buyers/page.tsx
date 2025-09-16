@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/user-context";
 import { useFetchApi } from "@/hooks/use-fetch";
 import { Loader2, UserMinus } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -53,14 +54,19 @@ const BuyersPage = () => {
             search capabilities.
           </p>
         </div>
-        <Button
-          variant="destructive"
-          className="flex items-center gap-2"
-          onClick={handleLogout}
-        >
-          <UserMinus className="w-4 h-4" />
-          Logout
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button className="bg-accent hover:bg-accent/90">
+            <Link href="/buyers/new">New Lead</Link>
+          </Button>
+          <Button
+            variant="destructive"
+            className="flex items-center gap-2"
+            onClick={handleLogout}
+          >
+            <UserMinus className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
       </div>
 
       <LeadsTable />
