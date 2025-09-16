@@ -28,7 +28,11 @@ interface DataTableProps {
 
 export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
   const router = useRouter();
-  const { userId } = useUser();
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
 
   const getSortIcon = (column: string) => {
     if (sortBy !== column) {
@@ -143,7 +147,9 @@ export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
                         router.push(`/buyers/${lead.id}?edit=true`);
                       }}
                       className="h-8 w-8 p-0"
-                      disabled={lead.ownerId !== userId}
+                      disabled={
+                        lead.ownerId !== user.id && user.role !== "ADMIN"
+                      }
                     >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Edit lead</span>

@@ -26,7 +26,7 @@ export default function BuyerDetailsPage({
   const [isEdit, setIsEdit] = useState(false);
   const { id } = React.use(params);
   const router = useRouter();
-  const { userId, loading: userLoading } = useUser();
+  const { user, loading: userLoading } = useUser();
   const fetchApi = useFetchApi();
 
   const searchParams = useSearchParams();
@@ -34,7 +34,7 @@ export default function BuyerDetailsPage({
 
   useEffect(() => {
     if (userLoading) return;
-    if (!userId) {
+    if (!user) {
       router.push("/");
       // TODO: implement toast notification
       alert("Please sign in to access this page.");
@@ -96,7 +96,7 @@ export default function BuyerDetailsPage({
     );
   }
 
-  if (!userId) {
+  if (!user) {
     return null;
   }
 
@@ -149,14 +149,18 @@ export default function BuyerDetailsPage({
                     size="sm"
                     className="bg-accent hover:bg-accent/90"
                     onClick={() => setIsEdit(true)}
-                    disabled={buyer.ownerId !== userId}
+                    disabled={
+                      buyer.ownerId !== user.id && user.role !== "ADMIN"
+                    }
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Buyer
                   </Button>
                   <DeleteDialog
                     id={buyer.id}
-                    isDisabled={userId !== buyer.ownerId}
+                    isDisabled={
+                      user.id !== buyer.ownerId && user.role !== "ADMIN"
+                    }
                   />
                 </div>
               )}

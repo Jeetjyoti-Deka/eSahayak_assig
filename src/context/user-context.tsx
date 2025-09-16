@@ -3,13 +3,18 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 const UserContext = createContext<{
-  userId: string | null;
-  setUserId: (id: string | null) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   loading: boolean;
 } | null>(null);
 
+type User = {
+  id: string;
+  role: "ADMIN" | "USER";
+};
+
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,10 +23,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await fetch("/api/auth/me");
         if (res.ok) {
           const data = await res.json();
-          setUserId(data.userId);
+          setUser({ id: data.userId, role: data.userRole });
           localStorage.setItem("userId", data.userId);
         } else {
-          setUserId(null);
+          setUser(null);
           localStorage.removeItem("userId");
         }
       } finally {
@@ -33,7 +38,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ userId, setUserId, loading }}>
+    <UserContext.Provider value={{ user, setUser, loading }}>
       {children}
     </UserContext.Provider>
   );

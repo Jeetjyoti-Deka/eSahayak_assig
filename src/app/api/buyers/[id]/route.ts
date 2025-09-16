@@ -14,6 +14,12 @@ export async function GET(
   }
 ) {
   const { id } = await params;
+
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return Response.json({ error: "User not authenticated" }, { status: 401 });
+  }
+
   try {
     const buyer = await prisma.buyer.findUnique({
       where: { id: id },
@@ -90,7 +96,7 @@ export async function PUT(
       return NextResponse.json({ error: "Buyer not found" }, { status: 404 });
     }
 
-    if (originalBuyer.ownerId !== user.id) {
+    if (originalBuyer.ownerId !== user.id && user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -146,6 +152,7 @@ export async function PUT(
               select: {
                 name: true,
                 email: true,
+                role: true,
               },
             },
           },
@@ -184,7 +191,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Buyer not found" }, { status: 404 });
     }
 
-    if (buyer.ownerId !== user.id) {
+    if (buyer.ownerId !== user.id && user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 

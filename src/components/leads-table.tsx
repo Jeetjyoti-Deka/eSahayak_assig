@@ -22,7 +22,7 @@ export function LeadsTable() {
 
   const [data, setData] = useState<PaginatedResponse<BuyerData> | null>(null);
   const [loading, setLoading] = useState(true);
-  const { userId } = useUser();
+  const { user } = useUser();
   const filterOptions = {
     cities: ["Chandigarh", "Mohali", "Zirakpur", "Panchkula", "Other"],
     propertyTypes: ["Apartment", "Villa", "Plot", "Office", "Retail"],
@@ -86,13 +86,9 @@ export function LeadsTable() {
     updateParams({ search: search || undefined });
   };
 
-  // if (loading && !data) {
-  //   return (
-  //     <div className="flex items-center justify-center h-64">
-  //       <Loader2 className="h-8 w-8 animate-spin" />
-  //     </div>
-  //   );
-  // }
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -147,7 +143,7 @@ export function LeadsTable() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" disabled={loading || !userId}>
+            <Button variant="outline" size="sm" disabled={loading}>
               <Link
                 href="/import"
                 className="flex items-center gap-2 bg-transparent"

@@ -9,12 +9,12 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const BuyersPage = () => {
-  const { userId, loading: userLoading, setUserId } = useUser();
+  const { user, loading: userLoading, setUser } = useUser();
   const router = useRouter();
   const fetchApi = useFetchApi();
   useEffect(() => {
     if (userLoading) return;
-    if (!userId) {
+    if (!user) {
       router.push("/");
       // TODO: implement toast notification
       alert("Please sign in to access this page.");
@@ -29,12 +29,12 @@ const BuyersPage = () => {
     );
   }
 
-  if (!userId) {
+  if (!user) {
     return null;
   }
 
   const handleLogout = async () => {
-    setUserId(null);
+    setUser(null);
     router.push("/");
     await fetchApi("/api/auth/logout", {
       method: "POST",

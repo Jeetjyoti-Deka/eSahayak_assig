@@ -27,13 +27,13 @@ export default function ImportPage() {
   const [successCount, setSuccessCount] = useState(0);
 
   const router = useRouter();
-  const { userId, loading: userLoading } = useUser();
+  const { user, loading: userLoading } = useUser();
 
   const fetchApi = useFetchApi();
 
   useEffect(() => {
     if (userLoading) return;
-    if (!userId) {
+    if (!user) {
       router.push("/");
       // TODO: implement toast notification
       alert("Please sign in to access this page.");
@@ -48,7 +48,7 @@ export default function ImportPage() {
     );
   }
 
-  if (!userId) {
+  if (!user) {
     return null;
   }
 

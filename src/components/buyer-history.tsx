@@ -148,7 +148,10 @@ export function BuyerHistory({ history }: BuyerHistoryProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-medium text-foreground">
-                        {entry.changedByUser.name || entry.changedByUser.email}
+                        {entry.changedByUser.role === "ADMIN"
+                          ? "Admin"
+                          : entry.changedByUser.name ||
+                            entry.changedByUser.email}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatDate(entry.changedAt)}

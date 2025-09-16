@@ -30,6 +30,7 @@ export interface HistoryEntry {
   changedByUser: {
     name?: string;
     email: string;
+    role: "ADMIN" | "USER";
   };
   changedAt: Date;
   diff:

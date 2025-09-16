@@ -34,7 +34,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
   const router = useRouter();
-  const { setUserId } = useUser();
+  const { setUser } = useUser();
   const fetchApi = useFetchApi();
 
   const {
@@ -45,7 +45,6 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     clearErrors,
   } = useForm<FormData>({
     resolver: zodResolver(registerSchema),
-    // mode: "onBlur",
   });
 
   const onSubmit = async (data: FormData) => {
@@ -65,7 +64,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       }
 
       const resp = await res.json();
-      setUserId(resp.user.id);
+      setUser({ id: resp.user.id, role: resp.user.role });
     } else {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -79,7 +78,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       }
 
       const resp = await res.json();
-      setUserId(resp.user.id);
+      setUser({ id: resp.user.id, role: resp.user.role });
     }
     setIsLoading(false);
     router.push("/buyers");
@@ -101,7 +100,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
       return;
     }
     const resp = await res.json();
-    setUserId(resp.user.id);
+    setUser({ id: resp.user.id, role: resp.user.role });
     setDemoLoading(false);
     router.push("/buyers");
   };

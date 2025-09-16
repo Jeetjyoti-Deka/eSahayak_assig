@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export function useFetchApi() {
   const router = useRouter();
-  const { setUserId } = useUser();
+  const { setUser } = useUser();
 
   async function fetchApi(url: string, options?: RequestInit) {
     const response = await fetch(url, options);
@@ -13,7 +13,7 @@ export function useFetchApi() {
       if (response.status === 401) {
         alert("Please sign in to access this page.");
         router.push("/");
-        setUserId(null);
+        setUser(null);
         return null;
       }
 
