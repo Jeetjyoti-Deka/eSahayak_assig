@@ -185,10 +185,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const buyerId = params.id;
+    const { id: buyerId } = await params;
 
     const user = await getCurrentUser(request);
     if (!user) {
