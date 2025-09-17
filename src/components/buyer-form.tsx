@@ -22,11 +22,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { X } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormData } from "@/lib/types";
+import Link from "next/link";
 
 interface BuyerFormProps {
   defaultValues?: FormData;
@@ -102,12 +103,26 @@ export default function BuyerForm({ defaultValues, onSubmit }: BuyerFormProps) {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-4xl">
         <Card className="form-section shadow-xl border-0 bg-card">
-          <CardHeader className="text-center pb-8">
+          <CardHeader className="text-center pb-8 relative">
+            {!defaultValues && (
+              <Link href="/buyers">
+                <Button
+                  className="absolute top-0 left-2 hover:bg-slate-300 group"
+                  variant="ghost"
+                >
+                  <ArrowLeft className="h-6 w-6 text-black group-hover:text-black" />
+                </Button>
+              </Link>
+            )}
             <CardTitle className="text-3xl font-bold text-foreground text-balance">
-              Real Estate Lead Form
+              {defaultValues
+                ? "Update Buyer Information"
+                : "Submit Buyer Information"}
             </CardTitle>
             <CardDescription className="text-lg text-muted-foreground text-pretty">
-              Help us find your perfect property by providing some details
+              {defaultValues
+                ? "Update your details so we can keep sending you the most relevant properties."
+                : "Help us find the perfect property by providing some details."}
             </CardDescription>
           </CardHeader>
 
