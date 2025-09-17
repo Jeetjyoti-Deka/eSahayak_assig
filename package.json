@@ -9,6 +9,9 @@
     "start": "next start",
     "test": "vitest"
   },
+  "prisma": {
+    "seed": "node --loader ts-node/esm prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "@radix-ui/react-dialog": "^1.1.15",
