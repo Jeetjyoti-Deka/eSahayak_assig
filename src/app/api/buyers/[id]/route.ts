@@ -68,7 +68,6 @@ export async function PUT(
       { status: 400 }
     );
   }
-  // TODO: check if user is authenticated and has access to the buyer
   const user = await getCurrentUser(req);
   if (!user) {
     return Response.json({ error: "User not authenticated" }, { status: 401 });

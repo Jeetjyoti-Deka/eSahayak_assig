@@ -14,6 +14,7 @@ import { ChevronDown, Loader2 } from "lucide-react";
 import type { BuyerData } from "@/lib/types";
 import { statusColors, statusLabels } from "@/lib/mappings";
 import { useFetchApi } from "@/hooks/use-fetch";
+import { toast } from "sonner";
 
 interface StatusDropdownProps {
   lead: BuyerData;
@@ -46,7 +47,7 @@ export function StatusDropdown({ lead, isInert }: StatusDropdownProps) {
     });
 
     if (!res) {
-      // You could add a toast notification here
+      toast.error("Could not update status. Please try again later.");
       setCurrentStatus(oldStatus);
       return;
     }

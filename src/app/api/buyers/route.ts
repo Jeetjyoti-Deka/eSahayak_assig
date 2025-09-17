@@ -8,7 +8,6 @@ import { Prisma, City, PropertyType, Status, Timeline } from "@prisma/client";
 export async function POST(req: Request) {
   const data = await req.json();
 
-  // TODO: check if user is authenticated
   const user = await getCurrentUser(req);
   if (!user) {
     return Response.json({ error: "User not authenticated" }, { status: 401 });

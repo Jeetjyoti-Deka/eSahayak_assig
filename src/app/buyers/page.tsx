@@ -8,6 +8,7 @@ import { Loader2, UserMinus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const BuyersPage = () => {
   const { user, loading: userLoading, setUser } = useUser();
@@ -17,8 +18,7 @@ const BuyersPage = () => {
     if (userLoading) return;
     if (!user) {
       router.push("/");
-      // TODO: implement toast notification
-      alert("Please sign in to access this page.");
+      toast.warning("Please sign in to access the page.");
     }
   }, [userLoading]);
 

@@ -1,6 +1,7 @@
 "use client";
 import { useUser } from "@/context/user-context";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function useFetchApi() {
   const router = useRouter();
@@ -11,34 +12,33 @@ export function useFetchApi() {
 
     if (!response.ok) {
       if (response.status === 401) {
-        alert("Please sign in to access this page.");
+        toast.warning("Please sign in to continue.");
         router.push("/");
         setUser(null);
         return null;
       }
 
       if (response.status === 400) {
-        // TODO: toast notification
-        alert("Invalid input");
+        toast.error("Invalid input");
         return null;
       }
 
       if (response.status === 403) {
-        alert("you are not authorized for this action.");
+        toast.error("you are not authorized for this action.");
         return null;
       }
 
       if (response.status === 409) {
-        alert("Record changed, please refresh to get the latest data.");
+        toast.info("Record changed, please refresh to get the latest data.");
         return null;
       }
 
       if (response.status === 429) {
-        alert("Too many requests, please try again later.");
+        toast.error("Too many requests, please try again later.");
         return null;
       }
 
-      alert("Something went wrong. Try again later.");
+      toast.error("Something went wrong. Try again later.");
       router.push("/buyers");
       return null;
     }

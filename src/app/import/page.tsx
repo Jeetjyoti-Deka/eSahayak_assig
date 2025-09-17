@@ -12,6 +12,7 @@ import Papa from "papaparse";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user-context";
 import { useFetchApi } from "@/hooks/use-fetch";
+import { toast } from "sonner";
 
 interface ValidationError {
   row: number;
@@ -35,8 +36,7 @@ export default function ImportPage() {
     if (userLoading) return;
     if (!user) {
       router.push("/");
-      // TODO: implement toast notification
-      alert("Please sign in to access this page.");
+      toast.warning("Please sign in to access the page.");
     }
   }, [userLoading]);
 

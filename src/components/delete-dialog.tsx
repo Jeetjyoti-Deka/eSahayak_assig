@@ -14,6 +14,7 @@ import {
 import { useFetchApi } from "@/hooks/use-fetch";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function DeleteDialog({
   id,
@@ -34,7 +35,7 @@ export function DeleteDialog({
       return null;
     }
 
-    alert("buyer deleted");
+    toast.success("buyer deleted");
     router.push("/buyers");
   };
 

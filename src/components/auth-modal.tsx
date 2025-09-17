@@ -20,6 +20,7 @@ import { registerSchema } from "@/lib/validations";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user-context";
 import { useFetchApi } from "@/hooks/use-fetch";
+import { toast } from "sonner";
 
 type FormData = z.infer<typeof registerSchema>;
 
@@ -57,8 +58,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        // TODO: implement toast notification
-        alert("Invalid credentials");
+        toast.error("Invalid credentials");
         setIsLoading(false);
         return;
       }
@@ -71,8 +71,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        // TODO: implement toast notification
-        alert("Could not Sign up. Please try again later");
+        toast.error("Could not Sign up. Please try again later");
         setIsLoading(false);
         return;
       }
@@ -96,7 +95,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
 
     if (!res) {
       setDemoLoading(false);
-      alert("Could not login. Try again later.");
+      toast.error("Could not login. Try again later.");
       return;
     }
     const resp = await res.json();

@@ -7,6 +7,7 @@ import { FormData } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function NewBuyerPage() {
   const router = useRouter();
@@ -16,8 +17,7 @@ export default function NewBuyerPage() {
     if (userLoading) return;
     if (!user) {
       router.push("/");
-      // TODO: implement toast notification
-      alert("Please sign in to access this page.");
+      toast.warning("Please sign in to access the page.");
     }
   }, [userLoading]);
 

@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import React from "react";
+import { toast } from "sonner";
 
 export default function BuyerDetailsPage({
   params,
@@ -36,8 +37,7 @@ export default function BuyerDetailsPage({
     if (userLoading) return;
     if (!user) {
       router.push("/");
-      // TODO: implement toast notification
-      alert("Please sign in to access this page.");
+      toast.warning("Please sign in to access the page.");
     }
   }, [userLoading]);
 
@@ -79,13 +79,8 @@ export default function BuyerDetailsPage({
     delete resp.history;
     setBuyer(resp);
 
-    if (res.ok) {
-      router.refresh();
-      setIsEdit(false);
-    } else {
-      const err = await res.json();
-      alert(err.error);
-    }
+    router.refresh();
+    setIsEdit(false);
 
     setLoading(false);
   };
