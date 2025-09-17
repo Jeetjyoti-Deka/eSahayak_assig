@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest",
+    "postinstall": "pnpm prisma generate",
+    "vercel-build": "pnpm prisma migrate deploy && pnpm prisma generate && pnpm run build"
   },
   "prisma": {
     "seed": "node --loader ts-node/esm prisma/seed.ts"
