@@ -57,7 +57,7 @@ export function DataTable({ data, onSort, sortBy, sortOrder }: DataTableProps) {
       <Button
         variant="ghost"
         onClick={() => onSort(column)}
-        className="h-auto p-0 font-semibold hover:bg-transparent"
+        className="h-auto p-0 font-semibold hover:bg-transparent hover:text-black cursor-pointer"
       >
         <div className="flex items-center gap-2">
           {children}
