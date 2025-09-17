@@ -15,6 +15,7 @@ import { Download, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useFetchApi } from "@/hooks/use-fetch";
+import { toast } from "sonner";
 
 export function LeadsTable() {
   const { filters, updateParams, resetFilters } = useTableParams();
@@ -57,6 +58,7 @@ export function LeadsTable() {
         });
         setData(result);
       } catch (error) {
+        toast.error("Failed to load leads. Please try again later.");
         console.error("Failed to load leads:", error);
       } finally {
         setLoading(false);
